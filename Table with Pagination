@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table with Pagination</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .pagination {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-link {
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .total-info {
+            margin-left: auto; /* Align to the right */
+        }
+
+        .navigate-button {
+            margin: 0 10px; /* Add some spacing */
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: #f2f2f2;
+        }
+
+            .navigate-button:hover {
+                background-color: #e0e0e0;
+            }
+    </style>
+</head>
+<body>
+
+    <div id="tableContainer"></div>
+    <div class="pagination" id="paginationContainer"></div>
+
+    <script>
+        $(document).ready(function () {
+            const data = [
+                { name: 'John Doe', age: 28, city: 'New York' },
+                { name: 'Jane Smith', age: 34, city: 'Los Angeles' },
+                { name: 'Mike Johnson', age: 45, city: 'Chicago' },
+                { name: 'Emily Davis', age: 22, city: 'San Francisco' },
+                { name: 'Chris Brown', age: 30, city: 'Seattle' },
+                { name: 'Anna Wilson', age: 36, city: 'Boston' },
+                { name: 'James Taylor', age: 40, city: 'Miami' },
+                { name: 'Laura Green', age: 29, city: 'Houston' },
+                { name: 'David Clark', age: 27, city: 'Dallas' },
+                { name: 'Sarah Martinez', age: 31, city: 'Austin' }
+                // Add more items to reach a total count of 69 if needed
+            ];
+
+            // Add more dummy data to simulate a total of 69 items
+            for (let i = data.length; i < 69; i++) {
+                data.push({ name: `Person ${i + 1}`, age: Math.floor(Math.random() * 50) + 20, city: `City ${i + 1}` });
+            }
+
+            const rowsPerPage = 10; // Updated to 20
+            let currentPage = 1;
+
+            function renderTable(page) {
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const paginatedData = data.slice(start, end);
+
+                // Clear previous table content
+                $('#tableContainer').empty();
+
+                // Create table
+                const table = $('<table></table>');
+                const thead = $('<thead></thead>');
+                const tbody = $('<tbody></tbody>');
+
+                // Create header row
+                const headerRow = $('<tr></tr>');
+                headerRow.append($('<th></th>').text('Name'));
+                headerRow.append($('<th></th>').text('Age'));
+                headerRow.append($('<th></th>').text('City'));
+                thead.append(headerRow);
+
+                // Create data rows
+                $.each(paginatedData, function (index, item) {
+                    const row = $('<tr></tr>');
+                    row.append($('<td></td>').text(item.name));
+                    row.append($('<td></td>').text(item.age));
+                    row.append($('<td></td>').text(item.city));
+                    tbody.append(row);
+                });
+
+                // Append thead and tbody to table
+                table.append(thead);
+                table.append(tbody);
+
+                // Append table to container
+                $('#tableContainer').append(table);
+
+                // Update pagination
+                renderPagination(page);
+            }
+
+            function renderPagination(page) {
+                $('#paginationContainer').empty();
+
+                const totalPages = Math.ceil(data.length / rowsPerPage);
+                const paginationHtml = $('<div></div>');
+
+                // First page button
+                const firstPageButton = $('<span class="navigate-button">|< </span>').click(() => renderTable(1));
+                paginationHtml.append(firstPageButton);
+
+                // Previous button
+                if (page > 1) {
+                    paginationHtml.append($('<span class="page-link"></span>').text('<').click(() => renderTable(page - 1)));
+                }
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageLink = $('<span class="page-link"></span>').text(i);
+                    if (i === page) {
+                        pageLink.css('font-weight', 'bold');
+                    } else {
+                        pageLink.click(() => renderTable(i));
+                    }
+                    paginationHtml.append(pageLink);
+                }
+
+                // Next button
+                if (page < totalPages) {
+                    paginationHtml.append($('<span class="page-link"></span>').text('>').click(() => renderTable(page + 1)));
+                }
+
+                // Last page button
+                const lastPageButton = $('<span class="navigate-button"> >|</span>').click(() => renderTable(totalPages));
+                paginationHtml.append(lastPageButton);
+
+                // Total count info
+                const startCount = (page - 1) * rowsPerPage + 1;
+                const endCount = Math.min(page * rowsPerPage, data.length);
+                const totalInfo = ` ${startCount} - ${endCount} of ${data.length} items`;
+                const totalInfoDiv = $('<div class="total-info"></div>').text(totalInfo);
+
+                // Append paginationHtml to container first
+                $('#paginationContainer').append(paginationHtml);
+
+                // Wrap pagination items in a single line
+                paginationHtml.css('display', 'flex');
+                paginationHtml.css('align-items', 'center');
+
+                $('#paginationContainer').append(paginationHtml);
+                $('#paginationContainer').append(totalInfoDiv);
+            }
+
+            // Initial render
+            renderTable(currentPage);
+        });
+    </script>
+
+</body>
+</html>
