@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Pagination Example</title>
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: none;
+            background-color: gray;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+            .pagination button.active {
+                background-color: #0056b3;
+            }
+
+            .pagination button:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+
+        .item-count {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <table id="myTable" border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Alice</td><td>25</td></tr>
+            <tr><td>Bob</td><td>30</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>Charlie</td><td>35</td></tr>
+            <tr><td>David</td><td>40</td></tr>
+            <tr><td>Eve</td><td>28</td></tr>
+            <tr><td>Frank</td><td>33</td></tr>
+            <tr><td>Grace</td><td>29</td></tr>
+            <tr><td>Heidi</td><td>31</td></tr>
+            <tr><td>Ivan</td><td>36</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+            <tr><td>Judy</td><td>22</td></tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="paginationControls">
+        <div class="pagination-controls" id="controls"></div>
+        <div class="item-count" id="itemCount"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function enablePagination(tableId, PaginationButton, itemCount, rowsPerPage) {
+            const $table = $(`#${tableId}`);
+            const $tbody = $table.find('tbody');
+            const $controls = $(`#${PaginationButton}`);
+            const $itemCount = $(`#${itemCount}`);
+
+            const totalRows = $tbody.find('tr').length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            let currentPage = 1;
+
+            function renderTable() {
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = Math.min(startIndex + rowsPerPage, totalRows);
+
+                $tbody.find('tr').hide(); // Hide all rows
+                for (let i = startIndex; i < endIndex; i++) {
+                    $tbody.find('tr').eq(i).show(); // Show current page rows
+                }
+
+                // Update item count display
+                $itemCount.text(`${startIndex + 1} - ${endIndex} of ${totalRows} items`);
+            }
+
+            function renderPagination() {
+                $controls.empty();
+
+                // First page button
+                const firstButton = `<button class="first-button" ${currentPage === 1 ? 'disabled' : ''}>|<</button>`;
+                $controls.append(firstButton);
+
+                // Previous button
+                const prevButton = `<button class="prev-button" ${currentPage === 1 ? 'disabled' : ''}> < </button>`;
+                $controls.append(prevButton);
+
+                // Page number buttons
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, currentPage + 2);
+                if (currentPage > 3) {
+                    $controls.append(`<button class="page-button" data-page="1">1</button>`);
+                    if (currentPage > 4) {
+                        $controls.append(`<span>...</span>`);
+                    }
+                }
+                for (let i = startPage; i <= endPage; i++) {
+                    const button = `<button class="page-button ${currentPage === i ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                    $controls.append(button);
+                }
+                if (currentPage < totalPages - 2) {
+                    if (currentPage < totalPages - 3) {
+                        $controls.append(`<span>...</span>`);
+                    }
+                    $controls.append(`<button class="page-button" data-page="${totalPages}">${totalPages}</button>`);
+                }
+
+                // Next button
+                const nextButton = `<button class="next-button" ${currentPage === totalPages ? 'disabled' : ''}> > </button>`;
+                $controls.append(nextButton);
+
+                // Last page button
+                const lastButton = `<button class="last-button" ${currentPage === totalPages ? 'disabled' : ''}>>|</button>`;
+                $controls.append(lastButton);
+            }
+
+            $controls.on('click', '.page-button', function () {
+                currentPage = $(this).data('page');
+                renderTable();
+                renderPagination();
+            });
+
+            $controls.on('click', '.prev-button', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                    renderPagination();
+                }
+            });
+
+            $controls.on('click', '.next-button', function () {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                    renderPagination();
+                }
+            });
+
+            $controls.on('click', '.first-button', function () {
+                currentPage = 1;
+                renderTable();
+                renderPagination();
+            });
+
+            $controls.on('click', '.last-button', function () {
+                currentPage = totalPages;
+                renderTable();
+                renderPagination();
+            });
+
+            // Initial render
+            renderTable();
+            renderPagination();
+        }
+
+        // Call the function to enable pagination
+        $(document).ready(function () {
+            enablePagination('myTable', 'controls', 'itemCount', 5);
+        });
+    </script>
+
+</body>
+</html>
