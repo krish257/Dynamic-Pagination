@@ -1,0 +1,41 @@
+<html>
+<head>    
+<style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full height of the viewport */
+            margin: 0; /* Remove default margin */
+        }
+
+        .header, .footer {
+            background-color: lightblue;
+            padding: 10px;
+            text-align: center;
+            flex: 0 0 auto; /* Fixed height */
+        }
+
+        .AutoAdjusted {
+            background-color: lightcoral;
+            flex: 1; /* Takes up remaining space */
+            overflow: hidden; /* Prevent scrollbars */
+        }
+    </style>
+    </head>
+    <body>
+    <div class="header">Header 1</div>
+    <div class="AutoAdjusted">
+        Main Content 1: <br>
+        This is some content. It will take the remaining space. <br>
+        (Make sure to keep this content minimal to avoid scrollbars.)
+    </div>
+    <div class="footer">Footer 1</div>
+
+    <div class="header">Header 2</div>
+    <div class="AutoAdjusted">
+        Main Content 2: <br>
+        This is some more content. Ensure the content fits within the available space.
+    </div>
+    <div class="footer">Footer 2</div>
+</head>
+</html>
